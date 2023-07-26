@@ -1,5 +1,5 @@
 [package]
-name = "opentube_db"
+name = "divideo_db"
 version = "0.1.0"
 edition = "2021"
 

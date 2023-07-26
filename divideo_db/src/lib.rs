@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use opentube_models::VideoDescriptor;
+use divideo_models::VideoDescriptor;
 
 pub trait Database
 where

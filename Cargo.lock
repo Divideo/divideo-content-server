@@ -3,20 +3,20 @@
 version = 3
 
 [[package]]
-name = "opentube"
+name = "divideo"
 version = "0.1.0"
 
 [[package]]
-name = "opentube_db"
+name = "divideo_db"
 version = "0.1.0"
 dependencies = [
- "opentube_models",
+ "divideo_models",
 ]
 
 [[package]]
-name = "opentube_http"
+name = "divideo_http"
 version = "0.1.0"
 
 [[package]]
-name = "opentube_models"
+name = "divideo_models"
 version = "0.1.0"
