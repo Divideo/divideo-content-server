@@ -6,4 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-divideo_models = { workspace = true }
+divideo_models.workspace = true
+rusqlite.workspace = true
