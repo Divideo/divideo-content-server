@@ -1,1 +1,3 @@
-pub struct Packet { }
+#![allow(dead_code)]
+
+pub struct Packet {}
