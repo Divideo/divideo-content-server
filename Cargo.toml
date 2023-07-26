@@ -1,0 +1,12 @@
+[package]
+name = "opentube"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["divideo_db", "divideo_http", "divideo_models"]
+
+[workspace.dependencies]
+divideo_db = { path = "./divideo_db" }
+divideo_http = { path = "./divideo_http" }
+divideo_models = { path = "./divideo_models" }
