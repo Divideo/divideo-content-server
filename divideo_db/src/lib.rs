@@ -1,8 +1,5 @@
-#![allow(unused)]
-
 use std::path::PathBuf;
 
-use image::io::Reader;
 use rusqlite::Connection as SQLiteDatabase;
 
 use divideo_models::{SearchQuery, VideoDescriptor};
