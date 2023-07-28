@@ -1,0 +1,12 @@
+[package]
+name = "divideo_db"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+divideo_models.workspace = true
+anyhow.workspace = true
+rusqlite.workspace = true
+uuid.workspace = true

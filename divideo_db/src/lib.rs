@@ -1,10 +1,12 @@
+#![allow(unused)]
+
 use std::path::PathBuf;
 
 use anyhow::Result;
 use rusqlite::Connection as SQLiteDatabase;
 use uuid::Uuid;
 
-use crate::models::{SearchQuery, VideoDescriptor};
+use divideo_models::{SearchQuery, VideoDescriptor};
 
 pub trait Database
 where
@@ -71,7 +73,6 @@ impl Database for SQLiteDatabase {
         })
     }
 
-    //TODO Maybe make this take a range instead? - Turnip
     fn search(&self, query: SearchQuery, start: usize, num: usize) -> Result<Vec<VideoDescriptor>> {
         unimplemented!()
     }

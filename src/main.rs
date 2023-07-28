@@ -1,5 +1,4 @@
-mod models;
-mod database;
+#![allow(dead_code, unused_variables)]
 
 use std::net::{TcpListener, TcpStream};
 
