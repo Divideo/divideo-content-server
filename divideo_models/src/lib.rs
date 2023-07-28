@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
+use std::fmt::{self, Display, Formatter};
 
-use image::DynamicImage;
 use uuid::Uuid;
 
 /// Represents a video in the database, allowing the client to render video metadata,
@@ -12,8 +12,19 @@ pub struct VideoDescriptor {
     pub title: String,
     // TODO: This should be a Markdown file
     pub description: String,
-    pub thumbnail: Option<DynamicImage>,
     // TODO: Comments
+}
+
+impl Display for VideoDescriptor {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        writeln!(
+            f,
+            "ID: {}
+            Title: {}
+            Description: {}",
+            self.id, self.title, self.description,
+        )
+    }
 }
 
 /// Represents all data needed by the content/indexing server to serve search results to the client.

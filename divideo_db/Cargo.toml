@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 divideo_models.workspace = true
+anyhow.workspace = true
 rusqlite.workspace = true
-image.workspace = true
+uuid.workspace = true
