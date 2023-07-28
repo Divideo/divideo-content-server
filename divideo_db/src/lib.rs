@@ -2,9 +2,8 @@
 
 use std::path::PathBuf;
 
-use anyhow::Result;
+use image::io::Reader;
 use rusqlite::Connection as SQLiteDatabase;
-use uuid::Uuid;
 
 use divideo_models::{SearchQuery, VideoDescriptor};
 
@@ -13,67 +12,62 @@ where
     Self: Sized,
 {
     /// Opens a connection to a database file.
-    fn open_database(path: impl Into<PathBuf>) -> Result<Self>;
-    /// Uploads a video into the database.
-    fn upload_video(&self, id: Uuid, title: &str, description: &str) -> Result<()>;
+    fn open(path: impl Into<PathBuf>) -> Option<Self>;
     /// Gets a video from the database based on its ID.
-    fn get_video(&self, id: Uuid) -> Result<VideoDescriptor>;
+    fn get_video(&self, id: u128) -> Option<VideoDescriptor>;
     /// Searches the database for videos matching the given query.
-    fn search(&self, query: SearchQuery, start: usize, num: usize) -> Result<Vec<VideoDescriptor>>;
+    fn search(&self, query: SearchQuery, start: usize, num: usize) -> Vec<VideoDescriptor>;
 }
 
 impl Database for SQLiteDatabase {
-    fn open_database(path: impl Into<PathBuf>) -> Result<Self> {
-        let db = Self::open(path.into())?;
+    fn open(path: impl Into<PathBuf>) -> Option<Self> {
+        let db = Self::open(path.into()).ok()?;
 
         // Create the necessary tables if they don't exist.
         db.execute(
             "CREATE TABLE IF NOT EXISTS videos (
-                id UUID PRIMARY KEY NOT NULL,
+                id UUID PRIMARY KEY,
                 title TEXT NOT NULL,
-                description TEXT,
+                description TEXT NOT NULL,
+                thumbnail TEXT,
             )",
             [],
-        )?;
+        )
+        .ok()?;
 
-        Ok(db)
+        Some(db)
     }
 
-    fn upload_video(&self, id: Uuid, title: &str, description: &str) -> Result<()> {
-        let mut query = self.prepare(
-            "INSERT INTO videos (id, title, description) VALUES (:id, :title, :description)",
-        )?;
+    fn get_video(&self, id: u128) -> Option<VideoDescriptor> {
+        let mut query = self
+            .prepare("SELECT id, title, description, thumbnail FROM videos WHERE id = (:id)")
+            .ok()?;
 
-        let id_string: &str = &id.to_string();
-        query.execute(&[
-            (":id", id_string),
-            (":title", title),
-            (":description", description),
-        ])?;
+        let video = query
+            .query_map(&[(":id", &id.to_string())], |row| {
+                let thumbnail_path: PathBuf = row.get::<usize, String>(3)?.into();
+                let thumbnail = Reader::open(&thumbnail_path)
+                    .unwrap_or(Err(rusqlite::Error::InvalidPath(thumbnail_path))?)
+                    .decode()
+                    .ok();
 
-        Ok(())
+                Ok(VideoDescriptor {
+                    id: row.get(0)?,
+                    title: row.get(1)?,
+                    description: row.get(2)?,
+                    thumbnail,
+                })
+            })
+            .ok()?
+            .next()?
+            .ok();
+
+        // Clippy thinks we can avoid a let binding here, but we cannot.
+        #[allow(clippy::let_and_return)]
+        video
     }
 
-    fn get_video(&self, id: Uuid) -> Result<VideoDescriptor> {
-        let mut query = self.prepare("SELECT id, title, description, FROM videos WHERE id == ?")?;
-
-        let mut rows = query.query([&id.to_string()])?;
-
-        // ? How do I error handle this?
-        let row = rows.next()?.unwrap();
-
-        // The ID must be converted from a string to a UUID.
-        let id_string: String = row.get(0)?;
-        let id = Uuid::try_parse(&id_string)?;
-
-        Ok(VideoDescriptor {
-            id,
-            title: row.get(1)?,
-            description: row.get(2)?,
-        })
-    }
-
-    fn search(&self, query: SearchQuery, start: usize, num: usize) -> Result<Vec<VideoDescriptor>> {
+    fn search(&self, query: SearchQuery, start: usize, num: usize) -> Vec<VideoDescriptor> {
         unimplemented!()
     }
 }
